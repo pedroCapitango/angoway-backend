@@ -24,28 +24,34 @@ export class BusService {
   ) {}
 
   async generateNIA(): Promise<string> {
+    // Use database-backed sequence to avoid race conditions
     const result = await this.prisma.$transaction(async (tx) => {
       const sequence = await tx.niaSequence.upsert({
         where: { id: 1 },
         update: { lastNIA: { increment: 1 } },
         create: { id: 1, lastNIA: 1 },
       });
-
       return `BUS-${String(sequence.lastNIA).padStart(4, '0')}`;
     });
-
     return result;
   }
 
   async createBus(data: Prisma.BusCreateInput) {
-    const nia = await this.generateNIA();
-    console.log("new NIA" + nia)
-    return this.prisma.bus.create({
-      data: {
-        ...data,
-        nia,
-      },
-    });
+    // retry logic in the unlikely case of sequence contention
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const nia = await this.generateNIA();
+      try {
+        return await this.prisma.bus.create({
+          data: { ...data, nia },
+        });
+      } catch (err: any) {
+        if (err?.code === 'P2002' && attempt < 2) {
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw new Error('Failed to create bus after retries');
   }
 
   //Mostrar os Buses
@@ -272,7 +278,14 @@ export class BusService {
         }
       }
     }
-    if (data.currentLoad !== null || data.currentLoad !== undefined) {
+    if (data.currentLoad !== null && data.currentLoad !== undefined) {
+      const parsedLoad = Number(data.currentLoad);
+      if (!Number.isFinite(parsedLoad) || parsedLoad < 0) {
+        return {
+          code: HttpStatus.BAD_REQUEST,
+          message: 'currentLoad inválido',
+        };
+      }
       const travel = await this.travelService.findOneByBusId(id);
       if (!travel) {
         return {
@@ -280,16 +293,15 @@ export class BusService {
           message: 'Registro da viagem não encontrado',
         };
       }
-      const currentProfit = Number(travel.profit);
-      const loadTimesPrice = Number(data.currentLoad) * this.BUS_RIDE_PRICE;
-
-      // update the travel profit - use travel.id (not bus id) and await the result
-      await this.prisma.travel.update({
-        where: { id: travel.id },
-        data: {
-          profit: currentProfit + loadTimesPrice,
-        },
-      });
+      const loadTimesPrice = parsedLoad * this.BUS_RIDE_PRICE;
+      if (loadTimesPrice > 0) {
+        await this.prisma.travel.update({
+          where: { id: travel.id },
+          data: {
+            profit: { increment: loadTimesPrice },
+          },
+        });
+      }
     }
     return this.prisma.bus.update({ where: { id }, data });
   }
