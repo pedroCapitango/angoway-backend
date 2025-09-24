@@ -24,16 +24,16 @@ export class BusService {
   ) {}
 
   async generateNIA(): Promise<string> {
-    // Use database-backed sequence to avoid race conditions
-    const result = await this.prisma.$transaction(async (tx) => {
-      const sequence = await tx.niaSequence.upsert({
-        where: { id: 1 },
-        update: { lastNIA: { increment: 1 } },
-        create: { id: 1, lastNIA: 1 },
-      });
-      return `BUS-${String(sequence.lastNIA).padStart(4, '0')}`;
+    const lastBus = await this.prisma.bus.findFirst({
+      orderBy: { id: 'desc' },
+      select: { nia: true },
     });
-    return result;
+    let number = 1;
+    if (lastBus?.nia) {
+      const match = lastBus.nia.match(/(\d+)$/);
+      if (match) number = parseInt(match[1], 10) + 1;
+    }
+    return `BUS-${String(number).padStart(4, '0')}`;
   }
 
   async createBus(data: Prisma.BusCreateInput) {
