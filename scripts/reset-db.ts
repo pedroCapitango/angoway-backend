@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-
 const prisma = new PrismaClient();
 
 async function resetDatabase() {
@@ -16,14 +15,7 @@ async function resetDatabase() {
     await prisma.driver.deleteMany({});
     await prisma.route.deleteMany({});
     await prisma.user.deleteMany({});
-    await prisma.niaSequence.deleteMany({});
-
-    await prisma.niaSequence.create({
-      data: { id: 1, lastNIA: 0 },
-    });
-
-    console.log('Database reset successfully.');
-    console.log('NIA sequence initialized - next bus will be BUS-0001');
+    console.log('Database reset successfully. (niaSequence skipped)');
   } catch (error) {
     console.error('Error resetting database:', error);
     throw error;
