@@ -19,7 +19,12 @@ export async function createTestApp(): Promise<TestContext> {
   }).compile();
 
   const app = moduleFixture.createNestApplication();
+  // debug start
+  // eslint-disable-next-line no-console
+  console.log('[TEST] Initializing Nest application...');
   await app.init();
+  // eslint-disable-next-line no-console
+  console.log('[TEST] Nest application initialized');
 
   const prisma = app.get(PrismaService);
   const agent = supertest(app.getHttpServer());
