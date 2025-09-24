@@ -13,16 +13,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { DriverService } from './driver.service';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Driver, Prisma } from '@prisma/client';
 import { ResponseBody } from 'src/types/response.body';
 import { DriverModule } from './driver.module';
 import { AuthGuard } from 'src/auth/auth.guard';
 
+@ApiTags('driver')
 @Controller('driver')
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
   @Post('')
+  @ApiOperation({ summary: 'Criar motorista' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createDriver(
@@ -36,6 +39,7 @@ export class DriverController {
   }
 
   @Get('/all')
+  @ApiOperation({ summary: 'Listar todos os motoristas' })
   @UseGuards(AuthGuard)
   async getAllDrivers(): Promise<Omit<Driver, 'password'>[]> {
     const drivers = await this.driverService.allDrivers();
@@ -46,6 +50,7 @@ export class DriverController {
   }
 
   @Get('/recent')
+  @ApiOperation({ summary: 'Listar motoristas recentes' })
   @UseGuards(AuthGuard)
   async getAllRecentDrivers(): Promise<Omit<Driver, 'password'>[]> {
     const drivers = await this.driverService.allRecentDrivers();
@@ -56,42 +61,49 @@ export class DriverController {
   }
 
   @Get('count-active')
+  @ApiOperation({ summary: 'Contar motoristas ativos' })
   @UseGuards(AuthGuard)
   async countActiveDrivers(): Promise<{ count: number }> {
     return await this.driverService.countActiveDrivers();
   }
 
   @Get('count')
+  @ApiOperation({ summary: 'Contar todos os motoristas' })
   @UseGuards(AuthGuard)
   async countDrivers(): Promise<{ count: number }> {
     return await this.driverService.countDrivers();
   }
 
   @Get('count-inactive')
+  @ApiOperation({ summary: 'Contar motoristas inativos' })
   @UseGuards(AuthGuard)
   async countInactiveDrivers(): Promise<{ count: number }> {
     return await this.driverService.countInactiveDrivers();
   }
 
   @Get('count-pending')
+  @ApiOperation({ summary: 'Motoristas pendentes' })
   @UseGuards(AuthGuard)
   async countPendingDrivers(): Promise<{ count: number; drivers: Driver[] }> {
     return await this.driverService.countPendingDrivers();
   }
 
   @Get('count-recent')
+  @ApiOperation({ summary: 'Contar motoristas recentes' })
   @UseGuards(AuthGuard)
   async countRecentDrivers(): Promise<{ count: number }> {
     return await this.driverService.countRecentDrivers();
   }
 
   @Get('count-effectives')
+  @ApiOperation({ summary: 'Contar motoristas efetivados' })
   @UseGuards(AuthGuard)
   async countEffectivatedDrivers(): Promise<{ count: number }> {
     return await this.driverService.countEffectivatedDrivers();
   }
 
   @Get('bus-assigned')
+  @ApiOperation({ summary: 'Motoristas com autocarro atribuído' })
   @UseGuards(AuthGuard)
   async getAssignedBusDrivers() {
     const drivers = await this.driverService.assignedBusDriver();
@@ -102,6 +114,7 @@ export class DriverController {
   }
 
   @Get('/:id')
+  @ApiOperation({ summary: 'Obter motorista por ID' })
   @UseGuards(AuthGuard)
   async getDriverById(
     @Param('id') id: string,
@@ -127,6 +140,7 @@ export class DriverController {
   }
 
   @Get('/available')
+  @ApiOperation({ summary: 'Motoristas disponíveis' })
   @UseGuards(AuthGuard)
   async getAvailableDrivers(): Promise<Omit<Driver, 'password'>[]> {
     const drivers = await this.driverService.getDriversAvailable();
@@ -137,6 +151,7 @@ export class DriverController {
   }
 
   @Get('/working')
+  @ApiOperation({ summary: 'Motoristas em rota' })
   @UseGuards(AuthGuard)
   async getWorkingDrivers(): Promise<Omit<Driver, 'password'>[]> {
     const drivers = await this.driverService.getDriversOnRoute();
@@ -147,6 +162,7 @@ export class DriverController {
   }
 
   @Post('assign-bus/:id')
+  @ApiOperation({ summary: 'Atribuir autocarro ao motorista por NIA' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   async assignBusToDriver(
@@ -174,6 +190,7 @@ export class DriverController {
   }
 
   @Patch('/update/:id')
+  @ApiOperation({ summary: 'Atualizar motorista' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   async updateDriver(
@@ -196,6 +213,7 @@ export class DriverController {
   }
 
   @Patch('/password/:id')
+  @ApiOperation({ summary: 'Alterar password do motorista' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   async updatePassword(
@@ -219,6 +237,7 @@ export class DriverController {
   }
 
   @Delete('/:id')
+  @ApiOperation({ summary: 'Remover motorista' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   async deleteDriver(@Param('id') id: string): Promise<ResponseBody> {
@@ -234,6 +253,7 @@ export class DriverController {
   }
 
   @Patch('/status/:id')
+  @ApiOperation({ summary: 'Atualizar status do motorista' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   async updateStatus(
