@@ -12,17 +12,20 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BusService } from './bus.service';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { busDetails } from 'src/types/bus.details';
 import { updateBusDetails } from 'src/types/update-bus-details';
 import { ResponseBody } from 'src/types/response.body';
 
+@ApiTags('bus')
 @Controller('bus')
 export class BusController {
   @Inject()
   private readonly busService: BusService;
 
   @Post('')
+  @ApiOperation({ summary: 'Criar autocarro', description: 'Regista um novo autocarro' })
   async createBus(@Body() busData: any): Promise<ResponseBody> {
     const bus = await this.busService.createBus(busData);
 
@@ -39,15 +42,18 @@ export class BusController {
     };
   }
   @Get('')
+  @ApiOperation({ summary: 'Listar autocarros' })
   async buses(): Promise<any[]> {
     return this.busService.buses();
   }
   @Get('with-route')
+  @ApiOperation({ summary: 'Listar autocarros com rota associada' })
   async busesWithRoute(): Promise<any[]> {
     return this.busService.busesWithRoute();
   }
 
   @Get('dashboard-details/:driverId')
+  @ApiOperation({ summary: 'Detalhes do autocarro para dashboard de motorista' })
   @UseGuards(AuthGuard)
   async getBusDetails(
     @Param('driverId') driverId: string,
@@ -83,6 +89,7 @@ export class BusController {
   }
 
   @Patch('dashboard-details/:busId')
+  @ApiOperation({ summary: 'Atualizar status/load do autocarro (fluxo de viagem)' })
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   async updateBusDetails(
@@ -110,6 +117,7 @@ export class BusController {
   }
 
   @Put('assign-driver/:busId')
+  @ApiOperation({ summary: 'Atribuir motorista ao autocarro' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   async assignDriverToBus(
@@ -137,6 +145,7 @@ export class BusController {
   }
 
   @Patch('status/:driverId')
+  @ApiOperation({ summary: 'Alterar status do autocarro via driverId' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async changeBusStatus(
@@ -159,6 +168,7 @@ export class BusController {
   }
 
   @Patch('route/:driverId/:routeId')
+  @ApiOperation({ summary: 'Alterar rota do autocarro' })
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   async changeBusRoute(
@@ -184,18 +194,21 @@ export class BusController {
   }
 
   @Get('count')
+  @ApiOperation({ summary: 'Contar autocarros' })
   @UseGuards(AuthGuard)
   async countBuses(): Promise<{ count: number }> {
     return await this.busService.countBuses();
   }
 
   @Get('pending')
+  @ApiOperation({ summary: 'Autocarros sem motorista' })
   @UseGuards(AuthGuard)
   async pendingBuses(): Promise<{ count: number; buses: any[] }> {
     return await this.busService.pendingBuses();
   }
 
   @Patch('update/:busId')
+  @ApiOperation({ summary: 'Atualizar dados do autocarro' })
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   async updateBus(
