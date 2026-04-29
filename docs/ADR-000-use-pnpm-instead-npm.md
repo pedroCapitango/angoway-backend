@@ -1,89 +1,84 @@
-# ADR-[NNN]: [Short Title of Decision]
+# ADR-000: Use pnpm instead of npm
 
-**Status:** Proposed | Accepted | Deprecated | Superseded by ADR-[NNN]  
-**Date:** YYYY-MM-DD  
-**Deciders:** [Names / Teams]  
-**Consulted:** [Names]  
-**Informed:** [Names / Teams]  
+**Status:** Proposed
+**Date:**: 2026-04-29  
+**Deciders:** @fevunge
+**Consulted:** none 
+**Informed:** @pedroCapitango, @DevDario
 
 ---
 
 ## Context
 
-> Descreva o problema, forças em jogo, e o contexto que levou a esta decisão. Seja objetivo e factual. Não inclua a decisão aqui.
+Update the package manager to pnpm, which is faster and more efficient than npm, especially for monorepos.
 
 ## Decision
 
-- **We will [decision].**
-- **We will use X**
-- **We decided to Y**
+- **We will install pnpm globally** to manage our JavaScript dependencies.
+- **We will replace npm commands with pnpm** in our package.json scripts and documentation.
+- **We will reinstall all dependencies** using pnpm to take advantage of its performance benefits.
 
 ## Rationale
 
-- Reason 1
-- Reason 2
-- Reason 3
+- Pnpm is significantly faster than npm due to its efficient handling of node_modules and caching.
+- Pnpm stores dependencies in a global content-addressable store, which saves disk space and speeds up installations.
+- Pnpm evites issues with hoisting and allows for better monorepo management, which is beneficial for our project structure.
 
 ## Options Considered
 
 ### Option A: [Name] 🟢  (chosen)
 
-**Description:** ...
+**Description:** Change the package manager to pnpm.
 
 **Pros:**
-- Pro 1
-- Pro 2
+- Way faster installations, especially for large projects.
+- More efficient disk space usage due to content-addressable storage.
+- Better handling of monorepos and complex dependency trees.
 
 **Cons:**
-- Con 1
+- Requires developers to install pnpm globally.
+- May require updates to documentation and scripts to reflect the change from npm to pnpm.
 
 ---
 
 ### Option B: [Name] 🛑 (not chosen)
 
-**Description:** ...
+**Description:** Continue using npm as the package manager.
 
 **Pros:**
-- Pro 1
+- No changes needed to developer environment or documentation.
+- Familiarity for all developers, as npm is widely used.
 
 **Cons:**
-- Con 1
-- Con 2
+- Slower installation times, especially as the project grows.
+- Less efficient disk space usage compared to pnpm.
+- Potential issues with hoisting and monorepo management as the project structure evolves.
 
 ---
-
 
 ## Consequences
 
 ### Positive
-- Benefit 1
-- Benefit 2
+- Benefit 1: Faster installation times, improving developer productivity.
+- Benefit 2: Reduced disk space usage, especially for large projects with many dependencies.
 
 ### Negative / Trade-offs
-- Trade-off 1
-- Technical debt introduced: ...
+- Developer onboarding may require an additional step to install pnpm globally.
+- Documentation and scripts will need to be updated to reflect the change from npm to pnpm.
 
 ### Neutral
-- Change in process: ...
+- Change in process: developers will need to use pnpm commands instead of npm, but this is a minor adjustment.
 
 ## Implementation Notes
 
-> Anything the team needs to know to implement or follow this decision.
+> Technical details and considerations for implementing the decision.
+1. Update the README and any relevant documentation to instruct developers to install pnpm globally.
+2. Replace all npm commands in package.json scripts with their pnpm equivalents.
 
 ## References
 
-- [Link to related issue/PR](url)
-- [Link to RFC/research](url)
-- [Link to superseded ADR](url)
-
+> [!NOTE]
+> none
 
 ---
-## Principles
 
-> Guiding principles that influence our architectural decisions.
-
-1. **Boring technology** — prefer proven, well-understood tools over cutting-edge
-2. **Operability first** — every system must be observable, debuggable, and deployable
-3. **Data integrity > convenience** — never sacrifice correctness for speed of development
-4. **Small, reversible steps** — prefer incremental changes with clear rollback paths
-5. **Explicit > implicit** — code and systems should be easy to reason about
